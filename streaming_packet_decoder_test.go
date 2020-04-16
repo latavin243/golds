@@ -12,11 +12,11 @@ import (
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-16 13:46:30
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-16 23:16:37
+ * @Last Modified time: 2020-04-17 00:00:02
  */
 
-func TestDecoder(t *testing.T) {
-	var decoder *golds.StreamingDecoder
+func TestStreamingPacketDecoder(t *testing.T) {
+	var decoder *golds.StreamingPacketDecoder
 	var err error
 	var packet *golds.Packet
 
@@ -34,7 +34,7 @@ func TestDecoder(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		decoder = golds.NewStreamingDecoder(bytes.NewReader([]byte(testCase)))
+		decoder = golds.NewStreamingPacketDecoder(bytes.NewReader([]byte(testCase)))
 		packet, err = decoder.Decode()
 		if err != nil {
 			t.Errorf("error: %s", err)

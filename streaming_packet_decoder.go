@@ -2,57 +2,37 @@ package golds
 
 import (
 	"bufio"
-	"errors"
 	"io"
 )
 
 /*
  * @Author: ZhenpengDeng(monitor1379)
- * @Date: 2020-04-15 22:34:24
+ * @Date: 2020-04-16 23:25:14
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-16 22:52:09
+ * @Last Modified time: 2020-04-16 23:56:29
  */
-var (
-	defaultReaderSize = 8192
-)
 
-var (
-	ErrBadLF                  = errors.New("end without \\n")
-	ErrBulkBytesLengthInvalid = errors.New("invalid bulk bytes length")
-	ErrBulkBytesLengthTooLong = errors.New("bulk bytes length is too long")
+var _ (PacketDecoder) = new(StreamingPacketDecoder)
 
-	ErrArrayLengthInvalid = errors.New("invalid array length")
-	ErrArrayLengthTooLong = errors.New("array length is too long")
-)
-
-const (
-	MaxBulkBytesLength = 1024 * 1024 * 1 // 1MB
-	MaxArrayLength     = 1024 * 1024 * 1 // 1M
-)
-
-type Decoder interface {
-	Decode() (*Packet, error)
-}
-
-type StreamingDecoder struct {
+type StreamingPacketDecoder struct {
 	bufioReader *bufio.Reader
 }
 
-func NewStreamingDecoderSize(reader io.Reader, size int) *StreamingDecoder {
-	streamingDecoder := new(StreamingDecoder)
-	streamingDecoder.bufioReader = bufio.NewReaderSize(reader, size)
-	return streamingDecoder
+func NewStreamingPacketDecoderSize(reader io.Reader, size int) *StreamingPacketDecoder {
+	streamingPacketDecoder := new(StreamingPacketDecoder)
+	streamingPacketDecoder.bufioReader = bufio.NewReaderSize(reader, size)
+	return streamingPacketDecoder
 }
 
-func NewStreamingDecoder(reader io.Reader) *StreamingDecoder {
-	return NewStreamingDecoderSize(reader, defaultReaderSize)
+func NewStreamingPacketDecoder(reader io.Reader) *StreamingPacketDecoder {
+	return NewStreamingPacketDecoderSize(reader, defaultPacketDecoderReaderSize)
 }
 
-func (this *StreamingDecoder) Decode() (*Packet, error) {
+func (this *StreamingPacketDecoder) Decode() (*Packet, error) {
 	return this.decode()
 }
 
-func (this *StreamingDecoder) decode() (*Packet, error) {
+func (this *StreamingPacketDecoder) decode() (*Packet, error) {
 	firstByte, err := this.bufioReader.ReadByte()
 	if err != nil {
 		return nil, err
@@ -73,7 +53,7 @@ func (this *StreamingDecoder) decode() (*Packet, error) {
 	return packet, nil
 }
 
-func (this *StreamingDecoder) decodeBytes() ([]byte, error) {
+func (this *StreamingPacketDecoder) decodeBytes() ([]byte, error) {
 	data, _, err := this.bufioReader.ReadLine()
 	if err != nil {
 		return nil, err
@@ -81,7 +61,7 @@ func (this *StreamingDecoder) decodeBytes() ([]byte, error) {
 	return data, nil
 }
 
-func (this *StreamingDecoder) decodeInt() (int, error) {
+func (this *StreamingPacketDecoder) decodeInt() (int, error) {
 	data, _, err := this.bufioReader.ReadLine()
 	if err != nil {
 		return 0, err
@@ -95,7 +75,7 @@ func (this *StreamingDecoder) decodeInt() (int, error) {
 	return int(number), nil
 }
 
-func (this *StreamingDecoder) decodeBulkBytes() ([]byte, error) {
+func (this *StreamingPacketDecoder) decodeBulkBytes() ([]byte, error) {
 	n, err := this.decodeInt()
 	if err != nil {
 		return nil, err
@@ -122,7 +102,7 @@ func (this *StreamingDecoder) decodeBulkBytes() ([]byte, error) {
 	return data[:n+1], nil
 }
 
-func (this *StreamingDecoder) decodeArray() ([]*Packet, error) {
+func (this *StreamingPacketDecoder) decodeArray() ([]*Packet, error) {
 	n, err := this.decodeInt()
 	if err != nil {
 		return nil, err
