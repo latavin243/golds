@@ -9,25 +9,36 @@ import (
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-15 22:34:24
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-15 23:53:49
+ * @Last Modified time: 2020-04-16 14:12:28
  */
+var (
+	defaultReaderSize = 8192
+)
 
 type Decoder interface {
-	Decode(io.Reader) (interface{}, error)
+	Decode() (*Packet, error)
 }
 
 type StreamingDocoder struct {
-	bufferSize uint64
+	bufioReader *bufio.Reader
 }
 
-func NewStreamingDecoder(bufferSize uint64) *StreamingDocoder {
-	decoder := new(StreamingDocoder)
-	decoder.bufferSize = bufferSize
-	return decoder
+func NewStreamingDecoderSize(reader io.Reader, size int) *StreamingDocoder {
+	streamingDecoder := new(StreamingDocoder)
+	streamingDecoder.bufioReader = bufio.NewReaderSize(reader, size)
+	return streamingDecoder
 }
 
-func (this *StreamingDocoder) Decode(reader io.Reader) (interface{}, error) {
-	bufioReader := bufio.NewReader(reader)
+func NewStreamingDecoder(reader io.Reader) *StreamingDocoder {
+	return NewStreamingDecoderSize(reader, defaultReaderSize)
+}
 
-	return []byte{}, nil
+func (this *StreamingDocoder) Decode() (*Packet, error) {
+	firstByte, err := this.bufioReader.ReadByte()
+	if err != nil {
+		return nil, err
+	}
+	packet := &Packet{PacketType: PacketType(firstByte)}
+
+	return packet, nil
 }
