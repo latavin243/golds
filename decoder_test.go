@@ -12,7 +12,7 @@ import (
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-16 13:46:30
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-16 14:12:54
+ * @Last Modified time: 2020-04-16 14:16:38
  */
 
 func TestDecoder(t *testing.T) {
@@ -22,5 +22,6 @@ func TestDecoder(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Println(packet)
 }

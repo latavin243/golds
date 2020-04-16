@@ -9,7 +9,7 @@ import (
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-15 22:34:24
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-16 14:12:28
+ * @Last Modified time: 2020-04-16 14:23:22
  */
 var (
 	defaultReaderSize = 8192
@@ -38,7 +38,38 @@ func (this *StreamingDocoder) Decode() (*Packet, error) {
 	if err != nil {
 		return nil, err
 	}
-	packet := &Packet{PacketType: PacketType(firstByte)}
-
+	packet := &Packet{}
+	packet.PacketType = PacketType(firstByte)
+	switch packet.PacketType {
+	case PacketTypeString:
+		packet.Value, err = this.decodeString()
+	case PacketTypeError:
+		packet.Value, err = this.decodeError()
+	case PacketTypeInt:
+		packet.Value, err = this.decodeInt()
+	case PacketTypeBulkString:
+		packet.Value, err = this.decodeBulkString()
+	case PacketTypeArray:
+		packet.Array, err = this.decodeArray()
+	}
 	return packet, nil
+}
+
+func (this *StreamingDocoder) decodeString() ([]byte, error) {
+	return nil, nil
+}
+func (this *StreamingDocoder) decodeError() ([]byte, error) {
+	return nil, nil
+}
+
+func (this *StreamingDocoder) decodeInt() ([]byte, error) {
+	return nil, nil
+}
+
+func (this *StreamingDocoder) decodeBulkString() ([]byte, error) {
+	return nil, nil
+}
+
+func (this *StreamingDocoder) decodeArray() ([]*Packet, error) {
+	return nil, nil
 }
