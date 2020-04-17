@@ -24,6 +24,17 @@ func TestStreamingPacketEncoder(t *testing.T) {
 		golds.Packet{PacketType: golds.PacketTypeBulkString, Value: []byte("hello")},
 		golds.Packet{PacketType: golds.PacketTypeBulkString, Value: []byte("")},
 		golds.Packet{PacketType: golds.PacketTypeBulkString, Value: nil},
+		golds.Packet{PacketType: golds.PacketTypeArray, Array: []*golds.Packet{
+			&golds.Packet{PacketType: golds.PacketTypeBulkString, Value: []byte("SET")},
+			&golds.Packet{PacketType: golds.PacketTypeBulkString, Value: []byte("key1")},
+			&golds.Packet{PacketType: golds.PacketTypeBulkString, Value: []byte("value1")},
+		}},
+
+		golds.Packet{PacketType: golds.PacketTypeArray, Array: []*golds.Packet{
+			&golds.Packet{PacketType: golds.PacketTypeInt, Value: []byte("1")},
+		}},
+		golds.Packet{PacketType: golds.PacketTypeArray, Array: []*golds.Packet{}},
+		golds.Packet{PacketType: golds.PacketTypeArray, Array: nil},
 	}
 
 	for _, packet := range packets {

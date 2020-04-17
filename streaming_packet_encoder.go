@@ -44,6 +44,7 @@ func (this *StreamingPacketEncoder) encode(packet *Packet) ([]byte, error) {
 	case PacketTypeBulkString:
 		data, err = this.encodeBulkBytes(packet)
 	case PacketTypeArray:
+		data, err = this.encodeArray(packet)
 	default:
 
 	}
@@ -117,5 +118,38 @@ func (this *StreamingPacketEncoder) encodeBulkBytes(packet *Packet) ([]byte, err
 	if err != nil {
 		return nil, err
 	}
+	return buf.Bytes(), nil
+}
+
+func (this *StreamingPacketEncoder) encodeArray(packet *Packet) ([]byte, error) {
+	var err error
+	buf := &bytes.Buffer{}
+
+	err = buf.WriteByte(byte(packet.PacketType))
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = buf.WriteString(strconv.Itoa(len(packet.Array)))
+	if err != nil {
+		return nil, err
+	}
+
+	err = buf.WriteByte('\n')
+	if err != nil {
+		return nil, err
+	}
+
+	for _, subPacket := range packet.Array {
+		data, err := this.encode(subPacket)
+		if err != nil {
+			return nil, err
+		}
+		_, err = buf.Write(data)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return buf.Bytes(), nil
 }
