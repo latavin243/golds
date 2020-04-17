@@ -76,7 +76,6 @@ func (this *StreamingPacketEncoder) encodeBytes(packet *Packet) ([]byte, error) 
 	return buf.Bytes(), nil
 }
 
-// TODO(monitor1379): handle $-1 situation
 func (this *StreamingPacketEncoder) encodeBulkBytes(packet *Packet) ([]byte, error) {
 	var err error
 	buf := &bytes.Buffer{}
@@ -84,6 +83,15 @@ func (this *StreamingPacketEncoder) encodeBulkBytes(packet *Packet) ([]byte, err
 	err = buf.WriteByte(byte(packet.PacketType))
 	if err != nil {
 		return nil, err
+	}
+
+	// 如果value数组为空，说明是"$-1\n"
+	if packet.Value == nil {
+		_, err = buf.WriteString("-1\n")
+		if err != nil {
+			return nil, err
+		}
+		return buf.Bytes(), nil
 	}
 
 	_, err = buf.WriteString(strconv.Itoa(len(packet.Value)))

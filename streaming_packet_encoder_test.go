@@ -23,6 +23,7 @@ func TestStreamingPacketEncoder(t *testing.T) {
 		golds.Packet{PacketType: golds.PacketTypeInt, Value: []byte("-1")},
 		golds.Packet{PacketType: golds.PacketTypeBulkString, Value: []byte("hello")},
 		golds.Packet{PacketType: golds.PacketTypeBulkString, Value: []byte("")},
+		golds.Packet{PacketType: golds.PacketTypeBulkString, Value: nil},
 	}
 
 	for _, packet := range packets {
