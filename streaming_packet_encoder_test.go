@@ -21,6 +21,8 @@ func TestStreamingPacketEncoder(t *testing.T) {
 		golds.Packet{PacketType: golds.PacketTypeError, Value: []byte("Error: error message")},
 		golds.Packet{PacketType: golds.PacketTypeInt, Value: []byte("1234")},
 		golds.Packet{PacketType: golds.PacketTypeInt, Value: []byte("-1")},
+		golds.Packet{PacketType: golds.PacketTypeBulkString, Value: []byte("hello")},
+		golds.Packet{PacketType: golds.PacketTypeBulkString, Value: []byte("")},
 	}
 
 	for _, packet := range packets {

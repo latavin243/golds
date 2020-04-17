@@ -3,6 +3,7 @@ package golds
 import (
 	"bytes"
 	"io"
+	"strconv"
 )
 
 /*
@@ -41,6 +42,7 @@ func (this *StreamingPacketEncoder) encode(packet *Packet) ([]byte, error) {
 	case PacketTypeString, PacketTypeError, PacketTypeInt:
 		data, err = this.encodeBytes(packet)
 	case PacketTypeBulkString:
+		data, err = this.encodeBulkBytes(packet)
 	case PacketTypeArray:
 	default:
 
@@ -63,6 +65,42 @@ func (this *StreamingPacketEncoder) encodeBytes(packet *Packet) ([]byte, error) 
 	if err != nil {
 		return nil, err
 	}
+	if n != len(packet.Value) {
+		return nil, err
+	}
+
+	err = buf.WriteByte('\n')
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+// TODO(monitor1379): handle $-1 situation
+func (this *StreamingPacketEncoder) encodeBulkBytes(packet *Packet) ([]byte, error) {
+	var err error
+	buf := &bytes.Buffer{}
+
+	err = buf.WriteByte(byte(packet.PacketType))
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = buf.WriteString(strconv.Itoa(len(packet.Value)))
+	if err != nil {
+		return nil, err
+	}
+
+	err = buf.WriteByte('\n')
+	if err != nil {
+		return nil, err
+	}
+
+	n, err := buf.Write(packet.Value)
+	if err != nil {
+		return nil, err
+	}
+
 	if n != len(packet.Value) {
 		return nil, err
 	}
