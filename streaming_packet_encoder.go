@@ -9,7 +9,7 @@ import (
  * @Last Modified by: ZhenpengDeng(monitor1379)
  * @Last Modified time: 2020-04-17 00:43:44
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-17 14:43:50
+ * @Last Modified time: 2020-04-17 14:48:32
  */
 
 type StreamingPacketEncoder struct {
@@ -38,10 +38,8 @@ func (this *StreamingPacketEncoder) encode(packet *Packet) ([]byte, error) {
 	var data []byte
 	var err error
 	switch packet.PacketType {
-	case PacketTypeString:
-		data, err = this.encodeString(packet)
-	case PacketTypeError:
-	case PacketTypeInt:
+	case PacketTypeString, PacketTypeError, PacketTypeInt:
+		data, err = this.encodeBytes(packet)
 	case PacketTypeBulkString:
 	case PacketTypeArray:
 	default:
@@ -53,7 +51,7 @@ func (this *StreamingPacketEncoder) encode(packet *Packet) ([]byte, error) {
 	return data, nil
 }
 
-func (this *StreamingPacketEncoder) encodeString(packet *Packet) ([]byte, error) {
+func (this *StreamingPacketEncoder) encodeBytes(packet *Packet) ([]byte, error) {
 	var err error
 	buf := &bytes.Buffer{}
 	err = buf.WriteByte(byte(packet.PacketType))

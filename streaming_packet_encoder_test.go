@@ -4,7 +4,7 @@ package golds_test
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-17 00:45:45
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-17 14:45:31
+ * @Last Modified time: 2020-04-17 14:48:57
  */
 import (
 	"bytes"
@@ -18,6 +18,9 @@ import (
 func TestStreamingPacketEncoder(t *testing.T) {
 	packets := []golds.Packet{
 		golds.Packet{PacketType: golds.PacketTypeString, Value: []byte("hello world")},
+		golds.Packet{PacketType: golds.PacketTypeError, Value: []byte("Error: error message")},
+		golds.Packet{PacketType: golds.PacketTypeInt, Value: []byte("1234")},
+		golds.Packet{PacketType: golds.PacketTypeInt, Value: []byte("-1")},
 	}
 
 	for _, packet := range packets {
