@@ -12,7 +12,7 @@ import (
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-16 13:46:30
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-17 00:00:02
+ * @Last Modified time: 2020-04-17 13:44:02
  */
 
 func TestStreamingPacketDecoder(t *testing.T) {
@@ -34,7 +34,7 @@ func TestStreamingPacketDecoder(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		decoder = golds.NewStreamingPacketDecoder(bytes.NewReader([]byte(testCase)))
+		decoder = golds.NewStreamingPacketDecoder(bytes.NewBuffer([]byte(testCase)))
 		packet, err = decoder.Decode()
 		if err != nil {
 			t.Errorf("error: %s", err)

@@ -1,28 +1,33 @@
 package golds_test
 
+/*
+ * @Author: ZhenpengDeng(monitor1379)
+ * @Date: 2020-04-17 00:45:45
+ * @Last Modified by: ZhenpengDeng(monitor1379)
+ * @Last Modified time: 2020-04-17 14:45:31
+ */
 import (
-	"bufio"
 	"bytes"
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/monitor1379/golds"
 )
 
-/*
- * @Author: ZhenpengDeng(monitor1379)
- * @Date: 2020-04-17 00:45:45
- * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-17 00:51:23
- */
-
 func TestStreamingPacketEncoder(t *testing.T) {
-	buf := &bytes.Buffer{}
-	writer := bufio.NewWriter(buf)
-	streamingPacketEncoder := golds.NewStreamingPacaketEncoder(writer)
-	_, err := streamingPacketEncoder.Encode(&golds.Packet{})
-	if err != nil {
-		panic(err)
+	packets := []golds.Packet{
+		golds.Packet{PacketType: golds.PacketTypeString, Value: []byte("hello world")},
 	}
-	fmt.Println(buf.String())
+
+	for _, packet := range packets {
+		buf := &bytes.Buffer{}
+		streamingPacketEncoder := golds.NewStreamingPacaketEncoder(buf)
+		_, err := streamingPacketEncoder.Encode(&packet)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(strconv.Quote(buf.String()))
+	}
+
 }
