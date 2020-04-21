@@ -1,16 +1,16 @@
 package golds
 
-import (
-	"fmt"
-	"net"
-)
-
 /*
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-15 21:13:09
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-16 14:10:56
+ * @Last Modified time: 2020-04-21 22:46:54
  */
+
+import (
+	"fmt"
+	"net"
+)
 
 type Server struct {
 	serverOptions ServerOptions
@@ -45,6 +45,11 @@ func (this *Server) Listen(address string) error {
 
 func (this *Server) handleConn(conn net.Conn) {
 	defer conn.Close()
+
+	for {
+
+		conn.Write([]byte("fuck you!\n"))
+	}
 
 	// readChan := make(chan []byte)
 	// writeChan := make(chan []byte)
