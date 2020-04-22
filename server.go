@@ -31,11 +31,10 @@ func (this *Server) Listen(address string) error {
 	if err != nil {
 		return err
 	}
+
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			// TODO(monitor1379): what situation will hit here
-			fmt.Println("ERROR(Accept):", err)
 			return err
 		}
 
@@ -46,51 +45,27 @@ func (this *Server) Listen(address string) error {
 func (this *Server) handleConn(conn net.Conn) {
 	defer conn.Close()
 
+	packetEncoder := NewPacketEncoder(conn)
+	packetDecoder := NewPacketDecoder(conn)
+
 	for {
+		reqPacket, err := packetDecoder.Decode()
+		if err != nil {
+			// TODO(monitor1379)
+			fmt.Printf("ERROR(golds): Decode packet error: %s\n", err)
+			continue
+		}
 
-		conn.Write([]byte("fuck you!\n"))
+		fmt.Println("request packet:", reqPacket.Array)
+
+		// Process command
+		fmt.Println("process command")
+
+		respPacket := &Packet{PacketType: PacketTypeString, Value: []byte("OK")}
+		_, err = packetEncoder.Encode(respPacket)
+		if err != nil {
+			fmt.Printf("ERROR(golds): Encode packet error: %s\n", err)
+		}
+		break
 	}
-
-	// readChan := make(chan []byte)
-	// writeChan := make(chan []byte)
-	// stopChan := make(chan bool)
-	// go this.readConn(conn, readChan, stopChan)
-	// go this.writeConn(conn, writeChan, stopChan)
-
-	// var isStopped bool
-	// for {
-	// 	select {
-	// 	case data := <-readChan:
-	// 		fmt.Println("READ:", string(data))
-	// 	case <-stopChan:
-	// 		fmt.Println("STOP")
-	// 		isStopped = true
-	// 	}
-	// 	if isStopped == true {
-	// 		break
-	// 	}
-	// }
-
 }
-
-// func (this *Server) readConn(conn net.Conn, readChan chan []byte, stopChan chan bool) {
-// 	decoder := NewStreamingDecoder(this.serverOptions.ReadBufferSize)
-
-// 	for {
-// 		data, err := decoder.Decode(conn)
-// 		if err != nil {
-// 			fmt.Println("ERROR(Read):", err)
-// 			break
-// 		}
-// 		fmt.Println("fuck", data)
-// 		readChan <- data.([]byte)
-// 	}
-// 	stopChan <- true
-// }
-
-// func (this *Server) writeConn(conn net.Conn, writeChan chan []byte, stopChan chan bool) {
-// 	for {
-// 		data := <-writeChan
-// 		conn.Write(data)
-// 	}
-// }

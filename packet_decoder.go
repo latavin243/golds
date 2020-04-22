@@ -109,11 +109,10 @@ func (this *PacketDecoder) decodeBulkBytes() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if data[n] == '\n' {
+	if data[n] != '\n' {
 		return nil, ErrBadLF
 	}
-
-	return data[:n+1], nil
+	return data[:n], nil
 }
 
 func (this *PacketDecoder) decodeArray() ([]*Packet, error) {

@@ -1,6 +1,7 @@
 package golds
 
 import (
+	"fmt"
 	"net"
 	"sync"
 )
@@ -39,18 +40,36 @@ func Dial(address string) (*Client, error) {
 }
 
 func (this *Client) Set(key, value []byte) error {
-	packet := &Packet{
-		PacketType: PacketTypeString,
-		Value:      []byte("fuck you"),
+	this.locker.Lock()
+	defer this.locker.Unlock()
+
+	reqPacket := &Packet{
+		PacketType: PacketTypeArray,
+		Array: []*Packet{
+			&Packet{PacketType: PacketTypeBulkString, Value: []byte("SET")},
+			&Packet{PacketType: PacketTypeBulkString, Value: key},
+			&Packet{PacketType: PacketTypeBulkString, Value: value},
+		},
 	}
-	_, err := this.packetEncoder.Encode(packet)
+
+	_, err := this.packetEncoder.Encode(reqPacket)
 	if err != nil {
 		return err
 	}
+
+	respPacket, err := this.packetDecoder.Decode()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(respPacket)
+
 	return nil
 }
 
 func (this *Client) Get(key []byte) ([]byte, error) {
+	this.locker.Lock()
+	defer this.locker.Unlock()
 	packet, err := this.packetDecoder.Decode()
 	if err != nil {
 		return nil, nil
