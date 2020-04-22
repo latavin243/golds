@@ -64,6 +64,10 @@ func (this *PacketDecoder) decode() (*Packet, error) {
 	default:
 		return nil, ErrInvalidPacketType
 	}
+
+	if err != nil {
+		return nil, err
+	}
 	return packet, nil
 }
 

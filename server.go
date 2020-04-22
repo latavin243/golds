@@ -9,6 +9,7 @@ package golds
 
 import (
 	"fmt"
+	"io"
 	"net"
 )
 
@@ -50,6 +51,10 @@ func (this *Server) handleConn(conn net.Conn) {
 
 	for {
 		reqPacket, err := packetDecoder.Decode()
+		if err == io.EOF {
+			fmt.Println("DEBUG(golds): connection closed by peer")
+			break
+		}
 		if err != nil {
 			// TODO(monitor1379)
 			fmt.Printf("ERROR(golds): Decode packet error: %s\n", err)
@@ -66,6 +71,5 @@ func (this *Server) handleConn(conn net.Conn) {
 		if err != nil {
 			fmt.Printf("ERROR(golds): Encode packet error: %s\n", err)
 		}
-		break
 	}
 }

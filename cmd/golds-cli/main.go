@@ -8,6 +8,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/monitor1379/golds"
 )
 
@@ -16,6 +18,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	err = client.Set([]byte("key1"), []byte("value"))
+	if err != nil {
+		panic(err)
+	}
+
+	time.Sleep(2 * time.Second)
 
 	err = client.Set([]byte("key1"), []byte("value"))
 	if err != nil {
