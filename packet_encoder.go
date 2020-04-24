@@ -13,22 +13,14 @@ import (
  * @Last Modified time: 2020-04-21 22:56:25
  */
 
-const (
-	defaultPacketEncoderWriterSize = 8192
-)
-
 type PacketEncoder struct {
 	writer io.Writer
 }
 
-func NewPacketEncoderSize(writer io.Writer, size int) *PacketEncoder {
+func NewPacketEncoder(writer io.Writer) *PacketEncoder {
 	packetEncoder := new(PacketEncoder)
 	packetEncoder.writer = writer
 	return packetEncoder
-}
-
-func NewPacketEncoder(writer io.Writer) *PacketEncoder {
-	return NewPacketEncoderSize(writer, defaultPacketEncoderWriterSize)
 }
 
 func (this *PacketEncoder) Encode(packet *Packet) (int, error) {

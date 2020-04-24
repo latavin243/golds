@@ -19,7 +19,7 @@ const (
 
 type Client struct {
 	conn          net.Conn
-	locker        *sync.Mutex
+	mu            *sync.Mutex
 	packetEncoder *PacketEncoder
 	packetDecoder *PacketDecoder
 }
@@ -32,7 +32,7 @@ func Dial(address string) (*Client, error) {
 
 	client := &Client{
 		conn:          conn,
-		locker:        &sync.Mutex{},
+		mu:            &sync.Mutex{},
 		packetEncoder: NewPacketEncoder(conn),
 		packetDecoder: NewPacketDecoder(conn),
 	}
@@ -40,8 +40,8 @@ func Dial(address string) (*Client, error) {
 }
 
 func (this *Client) Set(key, value []byte) error {
-	this.locker.Lock()
-	defer this.locker.Unlock()
+	this.mu.Lock()
+	defer this.mu.Unlock()
 
 	reqPacket := &Packet{
 		PacketType: PacketTypeArray,
@@ -68,8 +68,9 @@ func (this *Client) Set(key, value []byte) error {
 }
 
 func (this *Client) Get(key []byte) ([]byte, error) {
-	this.locker.Lock()
-	defer this.locker.Unlock()
+	this.mu.Lock()
+	defer this.mu.Unlock()
+
 	packet, err := this.packetDecoder.Decode()
 	if err != nil {
 		return nil, nil

@@ -11,23 +11,38 @@ import (
 	"fmt"
 	"io"
 	"net"
+
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
 type Server struct {
 	serverOptions ServerOptions
+	db            *leveldb.DB
 }
 
-func NewServer() *Server {
-	return NewServerWithServerOptions(defaultServerOptions)
+func NewServer(db *leveldb.DB) *Server {
+	serverOptions := ServerOptions{
+		PacketDecoderBufferSize: defaultPacketDecoderBufferSize,
+	}
+	return NewServerWithServerOptions(db, serverOptions)
 }
 
-func NewServerWithServerOptions(serverOptions ServerOptions) *Server {
+func NewServerWithServerOptions(db *leveldb.DB, serverOptions ServerOptions) *Server {
 	server := new(Server)
+	server.db = db
 	server.serverOptions = serverOptions
+
+	if server.serverOptions.PacketDecoderBufferSize == 0 {
+		server.serverOptions.PacketDecoderBufferSize = defaultPacketDecoderBufferSize
+	}
 	return server
 }
 
 func (this *Server) Listen(address string) error {
+	if this.db == nil {
+		return fmt.Errorf("db is nil")
+	}
+
 	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		return err
@@ -46,8 +61,8 @@ func (this *Server) Listen(address string) error {
 func (this *Server) handleConn(conn net.Conn) {
 	defer conn.Close()
 
+	packetDecoder := NewPacketDecoderSize(conn, this.serverOptions.PacketDecoderBufferSize)
 	packetEncoder := NewPacketEncoder(conn)
-	packetDecoder := NewPacketDecoder(conn)
 
 	for {
 		reqPacket, err := packetDecoder.Decode()
@@ -61,7 +76,7 @@ func (this *Server) handleConn(conn net.Conn) {
 			continue
 		}
 
-		fmt.Println("request packet:", reqPacket.Array)
+		fmt.Println("request packet:", reqPacket)
 
 		// Process command
 		fmt.Println("process command")

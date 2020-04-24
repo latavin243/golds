@@ -8,9 +8,9 @@ package golds
  */
 
 type ServerOptions struct {
-	ReadBufferSize int
+	PacketDecoderBufferSize int
 }
 
-var defaultServerOptions = ServerOptions{
-	ReadBufferSize: 1024 * 8,
-}
+const (
+	defaultPacketDecoderBufferSize = 1024 * 8
+)
