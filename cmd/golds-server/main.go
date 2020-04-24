@@ -6,10 +6,21 @@
  */
 package main
 
-import "github.com/monitor1379/golds"
+import (
+	"github.com/monitor1379/golds"
+	"github.com/syndtr/goleveldb/leveldb"
+)
 
 func main() {
-	server := golds.NewServer()
-	server.Listen(":3000")
+	db, err := leveldb.OpenFile("./db", nil)
+	if err != nil {
+		panic(err)
+	}
+
+	server := golds.NewServer(db)
+	err = server.Listen(":3000")
+	if err != nil {
+		panic(err)
+	}
 
 }
